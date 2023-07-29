@@ -1,18 +1,18 @@
 <?php
 require_once('../components/header.php');
-$post = sanitize($_POST);
 
 
-$test_id = $_POST['test_id'];
-$class_info = explode(',', $_POST['class_id']);
+
+$test_id = $post['test_id'];
+$class_info = explode(',', $post['class_id']);
 $class_id = $class_info[0];
 $year = $class_info[1];
-$japanese = $_POST['japanese'];
-$math = $_POST['math'];
-$english = $_POST['english'];
-$science = $_POST['science'];
-$society = $_POST['society'];
-$total = $_POST['total'];
+$japanese = $post['japanese'];
+$math = $post['math'];
+$english = $post['english'];
+$science = $post['science'];
+$society = $post['society'];
+$total = $post['total'];
 
 
 // データベースへの接続処理（例）

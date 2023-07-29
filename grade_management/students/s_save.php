@@ -1,36 +1,51 @@
 <?php
 require_once('../components/header.php');
-$post = sanitize($_POST);
 
-$year = $post['year'];
+// フォームから送信されたデータの受け取り
+if ($_SERVER['REQUEST_METHOD'] === 'POST')
+    $year = $post['year'];
 $class = $post['class'];
 $number = $post['number'];
 $name = $post['name'];
-
-
 
 // データベースへの接続処理（例）
 $dsn = 'mysql:dbname=grade_management;host=localhost;charset=utf8';
 $user = 'root';
 $password = '';
 
+
 try {
+
     $dbh = new PDO($dsn, $user, $password);
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // トランザクションの開始
+    $dbh->beginTransaction();
+    // 役職に応じて条件を追加してSQL文を作成
+    $sql1 = 'INSERT INTO classes (year, name) VALUES (:year,:name)';
+    // SQL文の準備
+    $stmt1 = $dbh->prepare($sql1);
+
+    // パラメータのバインド
+    $stmt1->bindParam(':year', $year, PDO::PARAM_INT);
+    $stmt1->bindParam(':name', $name, PDO::PARAM_STR);
+    // SQL文の実行
+    $stmt1->execute();
+
+    $class_id = $dbh->lastInsertId(); // 直前のINSERT文で挿入されたIDを取得
+    // 役職に応じて条件を追加してSQL文を作成
+    $sql2 = 'INSERT INTO students (class_id, class, number , created_at , updated_at) VALUES (:class_id, :class, :number , now(), now())';
 
     // SQL文の準備
-    $sql = 'INSERT INTO students (year, class, number, name, created_at, updated_at) VALUES (?, ?,?,?, NOW(), NOW())';
-    $stmt = $dbh->prepare($sql);
+    $stmt2 = $dbh->prepare($sql2);
 
-    // 値のバインド
-    $stmt->bindValue(1, $year, PDO::PARAM_INT);
-    $stmt->bindValue(2, $class, PDO::PARAM_INT);
-    $stmt->bindValue(3, $number, PDO::PARAM_INT);
-    $stmt->bindValue(4, $name, PDO::PARAM_STR);
-
-
+    // パラメータのバインド
+    $stmt2->bindParam(':class_id', $class_id, PDO::PARAM_INT);
+    $stmt2->bindParam(':class', $class, PDO::PARAM_INT);
+    $stmt2->bindParam(':number', $number, PDO::PARAM_INT);
     // SQL文の実行
-    $stmt->execute();
+    $stmt2->execute();
+    // 成功した場合はコミット
+    $dbh->commit();
 
     // データベース接続の解放
     $dbh = null;
@@ -40,24 +55,13 @@ try {
 
 } catch (PDOException $e) {
     // エラーハンドリング
+    // エラーが発生した場合はロールバック（変更を全て取り消し）
+    $dbh->rollBack();
     echo 'エラーが発生しました：' . $e->getMessage();
 }
 
-/*
-//postされたデータを受け取りサニタイズ
-//データベース接続　学年(year)とテスト名(test_name)をフォームから受け取り登録　id, year, test_name, created_at, updated_at
-//成功したら'登録が完了しました。対象学年<?php echo $year;?>テスト名<?php echo $test_name?>'
-*/
 ?>
-<!DOCTYPE html>
-<html lang="ja">
 
-<head>
-    <meta charset="UTF-8" />
-    <title>成績管理アプリ</title>
-    <link rel="stylesheet" href="">
-    <script src="" defer></script>
-</head>
 
 <body>
     <br />
@@ -66,5 +70,3 @@ try {
     </a>
     <br />
 </body>
-
-</html>

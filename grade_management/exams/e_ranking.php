@@ -1,4 +1,8 @@
 <?php
+// 共通ヘッダーを読み込む
+include '../components/header.php';
+
+?><?php
 $subject=$_POST['subject'];
 if (isset($_POST['test_id'])) {
     $test_id = $_POST['test_id'];
@@ -212,7 +216,7 @@ if (isset($_POST['test_id'])) {
     } ?>
     <br />
     <br />
-    <a href="e_index.php">戻る</a>
+    <a href="../index.php">戻る</a>
 </body>
 
 </html>

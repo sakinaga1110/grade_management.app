@@ -1,4 +1,7 @@
 <?php
+// 共通ヘッダーを読み込む
+include '../components/header.php';
+
 // データベースへの接続処理（テスト名を取得）
 $dsn = 'mysql:dbname=grade_management;host=localhost;charset=utf8';
 $user = 'root';
@@ -9,42 +12,46 @@ try {
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // SQL文の準備
-    $sql = 'SELECT * FROM tests';
-    $stmt = $dbh->prepare($sql);
+    $sql1 = 'SELECT * FROM tests';
+    if ($role === 'chief' || $role === 'general') {
+        $sql1 .= ' WHERE year=?';
+    }
+
+    $stmt1 = $dbh->prepare($sql1);
+    if ($role === 'chief' || $role === 'general') {
+        $stmt1->bindValue(1, $teacher_year, PDO::PARAM_INT);
+    }
 
     // SQL文の実行
-    $stmt->execute();
+    $stmt1->execute();
 
     // 結果の取得
-    $test_results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    // データベース接続の解放
-    $dbh = null;
-
-} catch (PDOException $e) {
-    // エラーハンドリング
-    echo 'エラーが発生しました：' . $e->getMessage();
-}
-
-// データベースへの接続処理(生徒名を取得)
-$dsn = 'mysql:dbname=grade_management;host=localhost;charset=utf8';
-$user = 'root';
-$password = '';
-
-try {
-    $dbh = new PDO($dsn, $user, $password);
-    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $test_results = $stmt1->fetchAll(PDO::FETCH_ASSOC);
 
     // SQL文の準備
-    $sql = 'SELECT * FROM classes INNER JOIN students ON classes.class_id = students.class_id';
+    $sql2 = 'SELECT * FROM classes INNER JOIN students ON classes.class_id = students.class_id';
+    if ($role === 'chief') {
+        $sql2 .= ' WHERE classes.year=?';
+    }
+    if ($role === 'general') {
+        $sql2 .= ' WHERE classes.year=? AND students.class=?';
+    }
 
-
-    $stmt = $dbh->prepare($sql);
+    $stmt2 = $dbh->prepare($sql2);
+    if ($role === 'chief') {
+        $stmt2->bindValue(1, $teacher_year, PDO::PARAM_INT);
+    }
+    if ($role === 'general') {
+        $stmt2->bindValue(1, $teacher_year, PDO::PARAM_INT);
+        $stmt2->bindValue(2, $teacher_class_id, PDO::PARAM_INT);
+    }
 
     // SQL文の実行
-    $stmt->execute();
+    $stmt2->execute();
 
     // 結果の取得
-    $classes_results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $classes_results = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+
     // データベース接続の解放
     $dbh = null;
 
@@ -91,11 +98,11 @@ try {
         <select name="class_id">
             <?php
             foreach ($classes_results as $class) {
-                echo '<option value="' . $class['class_id'] . ','.$class['year'].' ">' . $class['number'] . ' ' . $class['name'] . '</option>';
+                echo '<option value="' . $class['class_id'] . ',' . $class['year'] . ' ">' . $class['number'] . ' ' . $class['name'] . '</option>';
             }
             ?>
         </select>
-        
+
         国語
         <input type="number" min="0" max="100" name="japanese" onchange="calculateTotal()">
         数学
@@ -110,7 +117,7 @@ try {
         <input type="number" min="0" max="500" name="total" id="total" readonly>
         <input type="submit" value="テストの結果を登録する">
     </form>
-<a href="e_index.php">成績一覧に戻る</a>
+    <a href="e_index.php">成績一覧に戻る</a>
 </body>
 
 </html>

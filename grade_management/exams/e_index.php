@@ -1,9 +1,13 @@
 <?php
+// 共通ヘッダーを読み込む
+include '../components/header.php';
+
+?>
+<?php
 // データベースへの接続処理（例）
 $dsn = 'mysql:dbname=grade_management;host=localhost;charset=utf8';
 $user = 'root';
 $password = '';
-
 try {
     $dbh = new PDO($dsn, $user, $password);
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -12,7 +16,7 @@ try {
     $searchNumber = isset($_POST['number']) ? $_POST['number'] : '';
 
     // 検索クエリの作成
-    $sql = 'SELECT exams.id as exam_id, exams.japanese, exams.math, exams.english, exams.science, exams.society, exams.total, students.number, tests.id as test_id, tests.test_name, students.id as student_id, classes.name,classes.year
+    $sql = 'SELECT exams.id as exam_id, exams.japanese, exams.math, exams.english, exams.science, exams.society, exams.total, students.number, tests.id as test_id, tests.test_name, students.id as student_id, classes.name, classes.year
         FROM exams
         INNER JOIN students ON exams.student_id = students.id
         INNER JOIN tests ON exams.test_id = tests.id
@@ -26,7 +30,11 @@ try {
     if (!empty($searchNumber)) {
         $conditions[] = 'students.number LIKE :number';
     }
-
+    if ($role === 'general') {
+        $conditions[] = 'classes.year = :year AND students.class = :class';
+    } elseif ($role === 'chief') {
+        $conditions[] = 'classes.year = :year';
+    }
     if (!empty($conditions)) {
         $sql .= ' WHERE ' . implode(' AND ', $conditions);
     }
@@ -40,16 +48,22 @@ try {
     if (!empty($searchNumber)) {
         $stmt->bindValue(':number', '%' . $searchNumber . '%', PDO::PARAM_STR);
     }
+    if ($role === 'general') {
+        $stmt->bindValue(':year', $teacher_year, PDO::PARAM_INT);
+        $stmt->bindValue(':class', $teacher_class_id, PDO::PARAM_INT);
+    } elseif ($role === 'chief') {
+        $stmt->bindValue(':year', $teacher_year, PDO::PARAM_INT);
+    }
 
     $stmt->execute();
 
     // 検索結果を取得
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
     // 検索結果の数を取得
     $numResults = count($results);
 } catch (PDOException $e) {
+    // エラーハンドリング
     echo 'エラーが発生しました：' . $e->getMessage();
 }
 ?>

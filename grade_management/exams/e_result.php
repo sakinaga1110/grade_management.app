@@ -1,4 +1,8 @@
 <?php
+// 共通ヘッダーを読み込む
+include '../components/header.php';
+
+?><?php
 if (isset($_GET['test_id'])) {
     $test_id = $_GET['test_id'];
     //var_dump($test_id);

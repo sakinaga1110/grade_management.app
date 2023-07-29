@@ -1,15 +1,21 @@
-<?php ?>
-<!DOCTYPE html>
-<html lang="ja">
+<?php
+    // 共通ヘッダーを読み込む
+    include '../components/header.php';
+    ?>
+    <?php
+
+// アクセス権限がない場合はエラーメッセージを表示して戻るボタンを表示
+if ($role !== 'principal') {
+    echo '権限がありません。<br />';
+    echo '<a href="javascript:history.back()">戻る</a>';
+    exit;
+}
+    ?>
 
 <head>
-    <meta charset="UTF-8" />
-    <title>成績管理アプリ</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
     <script>
-
-
         function sendAjaxRequest(formId, action) {
             const form = document.getElementById(formId);
             const formData = new FormData(form);

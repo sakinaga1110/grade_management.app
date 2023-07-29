@@ -1,4 +1,5 @@
 <?php
+require_once('../components/header.php');
 // 各教科の点数を保持する配列
 $japaneseScores = [];
 $mathScores = [];
@@ -268,7 +269,7 @@ try {
         ?>
     </table>
 
-    <button onclick="goBack()">戻る</button>
+    <a href="s_index.php">戻る</a>
 
 </body>
 

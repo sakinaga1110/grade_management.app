@@ -1,10 +1,14 @@
 <?php
+require_once('../components/header.php');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = isset($_POST['name']) ? $_POST['name'] : '';
     $number = isset($_POST['number']) ? $_POST['number'] : '';
     $year = isset($_POST['year']) ? $_POST['year'] : '';
     $class = isset($_POST['class']) ? $_POST['class'] : '';
+    // var_dump($_POST);
+    // var_dump($role);
+
     // データベースへの接続処理
     $dsn = 'mysql:dbname=grade_management;host=localhost;charset=utf8';
     $user = 'root';
@@ -14,44 +18,112 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $dbh = new PDO($dsn, $user, $password);
         $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // SQL文の準備
+        // SQLクエリのベース部分
         $sql = 'SELECT * FROM classes INNER JOIN students ON classes.class_id = students.class_id WHERE 1';
 
-        // 名前での検索
-        if (!empty($name)) {
-            $sql .= ' AND classes.name LIKE :name';
+        // プレースホルダと値の配列を用意
+        $bindValues = array();
+
+        // 役職に応じた検索条件を追加
+        if ($role === 'chief') {
+            if (!empty($name) && !empty($number)) {
+                $sql .= ' AND classes.year = :year AND classes.name LIKE :name AND students.number = :number';
+                $bindValues[':year'] = $teacher_year;
+                $bindValues[':name'] = '%' . $name . '%';
+                $bindValues[':number'] = $number;
+                $sql .= ' ORDER BY class,number ASC';
+            } elseif (!empty($name)) {
+                $sql .= ' AND classes.year = :year AND classes.name LIKE :name';
+                $bindValues[':year'] = $teacher_year;
+                $bindValues[':name'] = '%' . $name . '%';
+                $sql .= ' ORDER BY class,number ASC';
+            } elseif (!empty($number)) {
+                $sql .= ' AND classes.year = :year AND students.number = :number';
+                $bindValues[':year'] = $teacher_year;
+                $bindValues[':number'] = $number;
+                $sql .= ' ORDER BY class,number ASC';
+            } elseif (!empty($class)) {
+                $sql .= ' AND classes.year = :year AND students.class = :class ';
+                $bindValues[':year'] = $teacher_year;
+                $bindValues[':class'] = $class;
+                $sql .= ' ORDER BY class,number ASC';
+            } else {
+                // 学年主任の場合は同じ学年の生徒のみを検索
+                $sql .= ' AND classes.year = :year';
+                $bindValues[':year'] = $teacher_year;
+                $sql .= ' ORDER BY class,number ASC';
+            }
+        } elseif ($role === 'general') {
+            if (!empty($name) && !empty($number)) {
+                $sql .= ' AND classes.year = :year AND students.class = :class AND classes.name LIKE :name AND students.number = :number';
+                $bindValues[':year'] = $teacher_year;
+                $bindValues[':class'] = $teacher_class_id;
+                $bindValues[':name'] = '%' . $name . '%';
+                $bindValues[':number'] = $number;
+                $sql .= ' ORDER BY number ASC';
+            } elseif (!empty($name)) {
+                $sql .= ' AND classes.year = :year AND students.class = :class AND classes.name LIKE :name';
+                $bindValues[':year'] = $teacher_year;
+                $bindValues[':class'] = $teacher_class_id;
+                $bindValues[':name'] = '%' . $name . '%';
+                $sql .= ' ORDER BY number ASC';
+            } elseif (!empty($number)) {
+                $sql .= ' AND classes.year = :year AND students.class = :class AND students.number = :number';
+                $bindValues[':year'] = $teacher_year;
+                $bindValues[':class'] = $teacher_class_id;
+                $bindValues[':number'] = $number;
+                $sql .= ' ORDER BY number ASC';
+            } elseif (!empty($class)) {
+                $sql .= ' AND classes.year = :year AND students.class = :class ';
+                $bindValues[':year'] = $teacher_year;
+                $bindValues[':class'] = $class;
+                $sql .= ' ORDER BY number ASC';
+            } else {
+                // 一般教員の場合は同じ学年かつ同じクラスの生徒のみを検索
+                $sql .= ' AND classes.year = :year AND students.class = :class';
+                $bindValues[':year'] = $teacher_year;
+                $bindValues[':class'] = $teacher_class_id;
+                $sql .= ' ORDER BY number ASC';
+            }
+        } elseif ($role === 'principal') {
+            if (!empty($name) && !empty($number)) {
+                $sql .= ' AND classes.name LIKE :name AND students.number = :number';
+                $bindValues[':name'] = '%' . $name . '%';
+                $bindValues[':number'] = $number;
+
+            } elseif (!empty($name)) {
+                $sql .= ' AND classes.name LIKE :name';
+                $bindValues[':name'] = '%' . $name . '%';
+
+            } elseif (!empty($number)) {
+                $sql .= ' AND students.number = :number';
+                $bindValues[':number'] = $number;
+
+            } elseif (!empty($class) && (!empty($year))) {
+                $sql .= ' AND classes.year = :year AND students.class = :class ';
+                $bindValues[':year'] = $year;
+                $bindValues[':class'] = $class;
+
+            } // Principalは学年やクラスの指定がない場合は全ての生徒を表示するので、特別な処理は行いません。
+            $sql .= ' ORDER BY year,class,number ASC';
         }
 
-        // 学籍番号での検索
-        if (!empty($number)) {
-            $sql .= ' AND students.number = :number';
-        }
 
-        // 学年・クラスでの検索
-        if (!empty($year) && !empty($class)) {
-            $sql .= ' AND classes.year = :year AND students.class = :class';
-        }
+        // SQLクエリの実行
         $stmt = $dbh->prepare($sql);
 
+
         // バインド変数の設定
-        if (!empty($name)) {
-            $stmt->bindValue(':name', '%' . $name . '%', PDO::PARAM_STR);
-        }
-        if (!empty($number)) {
-            $stmt->bindValue(':number', $number, PDO::PARAM_INT);
+        foreach ($bindValues as $placeholder => $value) {
+            $stmt->bindValue($placeholder, $value);
         }
 
-        if (!empty($year) && !empty($class)) {
-            $stmt->bindValue(':year', $year, PDO::PARAM_INT);
-            $stmt->bindValue(':class', $class, PDO::PARAM_INT);
-        }
-
-        // SQL文の実行
+        // SQLクエリの実行
         $stmt->execute();
 
         // 結果の取得
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        // var_dump($results);
+
         // データベース接続の解放
         $dbh = null;
 
@@ -61,6 +133,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -143,22 +216,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <form id="students_form_<?php echo $row['id']; ?>" method="post" action="s_score.php">
                                 <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
                                 <p>対象学年
-                                    <select name="year" required>
-                                        <option value="1" <?php echo $row['year'] == '1' ? ' selected' : ''; ?>>1年</option>
-                                        <option value="2" <?php echo $row['year'] == '2' ? ' selected' : ''; ?>>2年</option>
-                                        <option value="3" <?php echo $row['year'] == '3' ? ' selected' : ''; ?>>3年</option>
-                                    </select>
+                                    <?php if ($role !== "principal") { ?> <input type="hidden" name=year
+                                        value="<?php echo $row['year']; ?>"><?php echo $row['id']; ?>年
+                                <?php } else { ?><select name="year" required>
+                                    <option value="1" <?php echo $row['year'] == '1' ? ' selected' : ''; ?>>1年</option>
+                                    <option value="2" <?php echo $row['year'] == '2' ? ' selected' : ''; ?>>2年</option>
+                                    <option value="3" <?php echo $row['year'] == '3' ? ' selected' : ''; ?>>3年</option>
+                                </select>
+                            <?php } ?>
                                 </p>
                                 <p>
                                     組
+                                    <?php if ($role === "general") { ?> <input type="hidden" name=class
+                                        value="<?php echo $row['class']; ?>"><?php echo $row['class']; ?>組
+                                <?php } else { ?>
                                     <select name="class" required>
                                         <option value="1" <?php echo $row['class'] == '1' ? ' selected' : ''; ?>>1組</option>
                                         <option value="2" <?php echo $row['class'] == '2' ? ' selected' : ''; ?>>2組</option>
                                         <option value="3" <?php echo $row['class'] == '3' ? ' selected' : ''; ?>>3組</option>
                                         <option value="4" <?php echo $row['class'] == '4' ? ' selected' : ''; ?>>4組</option>
                                         <option value="5" <?php echo $row['class'] == '5' ? ' selected' : ''; ?>>5組</option>
-
                                     </select>
+                                <?php } ?>
                                 </p>
                                 <p>学籍番号
                                     <input type="number" name="number" value=<?php echo $row['number']; ?> required>
