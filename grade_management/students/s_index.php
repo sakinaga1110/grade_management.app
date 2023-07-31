@@ -19,28 +19,26 @@ try {
     if ($role === 'chief') {
         // 学年主任の場合の条件（年のみ指定）
         $sql .= ' WHERE year = :year ORDER BY class ASC';
+    } elseif ($role === 'general') {
+        $sql .= ' WHERE year = :year AND class =  :class';
+    } elseif ($role === 'principal') {
+        $sql .= 'ORDER BY year,class ASC';
     }
-elseif($role==='general'){
-    $sql .= ' WHERE year = :year AND class =  :class';
-}
-elseif($role==='principal'){
-    $sql.='ORDER BY year,class ASC';
-}
     // SQL文の準備
     $stmt = $dbh->prepare($sql);
 
     // パラメータのバインド
     if ($role === 'chief') {
         $stmt->bindParam(':year', $teacher_year, PDO::PARAM_INT);
-    }
-    elseif($role==='general'){ $stmt->bindParam(':year', $teacher_year, PDO::PARAM_INT);
+    } elseif ($role === 'general') {
+        $stmt->bindParam(':year', $teacher_year, PDO::PARAM_INT);
         $stmt->bindParam(':class', $teacher_class_id, PDO::PARAM_INT);
     }
 
     // SQL文の実行
     $stmt->execute();
 
-   
+
 
     // 結果の取得
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -54,75 +52,54 @@ elseif($role==='principal'){
 
 ?>
 
+<div class="d-flex bg-white justify-content-end">
+<br/>  
+<a href="s_created.php">
+    <h4 class="btn btn-primary">生徒を登録する</h4>
+</a>
+<form id="student_search_form" method="post" action="class_list.php">
+    <label for="search_name">　生徒名:</label>
+    <input type="text" id="search_name" name="name" placeholder="生徒名を入力">
 
-<!DOCTYPE html>
-<html lang="ja">
+    <label for="search_number">　学籍番号:</label>
+    <input type="text" id="search_number" name="number" placeholder="学籍番号を入力">
 
-<head>
-    <meta charset="UTF-8" />
-    <title>成績管理アプリ</title>
-    <link rel="stylesheet" href="">
-    <script>
-    // src="" defer>
-    </script>
-    <style>
-        input[type="submit"] {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
+    <input type="submit" class="btn btn-primary"  value="検索">
+</form>
+<br/><br/>
+</div>
 
-        /* Hover effect */
-        input[type="submit"]:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
 
-<body>
-    <h1>クラス一覧</h1>
-    <a href="s_created.php">
-        <h3>生徒を登録する</h3>
-    </a>
-    <form id="student_search_form" method="post" action="class_list.php">
-        <label for="search_name">生徒名:</label>
-        <input type="text" id="search_name" name="name" placeholder="生徒名を入力">
-
-        <label for="search_number">学籍番号:</label>
-        <input type="text" id="search_number" name="number" placeholder="学籍番号を入力">
-
-        <input type="submit" value="検索">
-    </form>
-    <br />
-    <br />
-    <?php
-    echo 'クラス名簿一覧';
-    $uniqueResults = array();
-
-    // 取得したデータを繰り返し処理で表示
-    foreach ($results as $row) {
-        $key = $row['year'] . '-' . $row['class'];
-        if (!isset($uniqueResults[$key])) {
-            $uniqueResults[$key] = $row;
-            echo '<label>';
-            echo '<form method="post" name="class_form" action="class_list.php">';
-            echo '<input type="hidden" name="year" value="' . $row['year'] . '">';
-            echo '<input type="hidden" name="class" value="' . $row['class'] . '">';
-            echo '<input type="submit" value="' . $row['year'] . ' - ' . $row['class'] . '"><br>';
-            echo '</form>';
-            echo '</label>';
-            echo '<br/>';
-        }
+<?php
+echo '<h3>クラス一覧</h3>';
+echo '<br/>';
+$uniqueResults = array();
+$counter = 0;
+echo '<div class="d-flex bg-white justify-content-evenly flex-wrap">';
+// 取得したデータを繰り返し処理で表示
+foreach ($results as $row) {
+    $key = $row['year'] . '-' . $row['class'];
+    if (!isset($uniqueResults[$key])) {
+        $uniqueResults[$key] = $row;
+        echo '<label>';
+        echo '<form method="post" name="class_form" action="class_list.php">';
+        echo '<input type="hidden" name="year" value="' . $row['year'] . '">';
+        echo '<input type="hidden" name="class" value="' . $row['class'] . '">';
+        echo '<input type="submit" class="btn btn-primary" value="' . $row['year'] . ' - ' . $row['class'] . '"><br>';
+        echo '</form>';
+        echo '</label>　';
     }
-    ?>
 
+    $counter++;
+    if ($counter % 6 === 0) {
+        echo '</div><br/><div class="d-flex bg-white justify-content-evenly flex-wrap">';
+$counter = 1;
+    }
+}
+echo '</div>';
+?>
 
-    <a href="../index.php">トップページへ</a>
+<br/><br/>
 
-</body>
-
-</html>
+<a href="../index.php" class="btn btn-primary">トップページへ</a>
+<br/><br/>

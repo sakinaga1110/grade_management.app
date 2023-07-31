@@ -9,7 +9,7 @@ $societyScores = [];
 // 各教科のテスト名を保持する配列
 $testNames = [];
 $number = $_POST['number'];
-$name=$_POST['name'];
+$name = $_POST['name'];
 // var_dump($_POST);
 // var_dump($number);
 // 
@@ -67,145 +67,134 @@ try {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="ja">
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<head>
-    <meta charset="UTF-8" />
-    <title>成績管理アプリ</title>
-    <link rel="stylesheet" href="">
-    <style>
-    </style>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script defer>
-        // DOMが完全に読み込まれた後に処理を実行する
-        window.onload = function () {
-            // Canvas要素が存在するか確認
-            const canvas = document.getElementById('myChart');
-            if (!canvas) {
-                console.error('Canvas要素が見つかりません。');
-                return;
-            }
-
-            // チャートの処理を記述する
-            const ctx = canvas.getContext('2d');
-            const testNames = <?php echo json_encode($testNames); ?>; // テスト名を配列に設定
-            const japaneseScores = <?php echo json_encode($japaneseScores); ?>;
-            const mathScores = <?php echo json_encode($mathScores); ?>;
-            const englishScores = <?php echo json_encode($englishScores); ?>;
-            const scienceScores = <?php echo json_encode($scienceScores); ?>;
-            const societyScores = <?php echo json_encode($societyScores); ?>;
-
-            const myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: testNames, // テスト名をX軸のラベルに設定
-                    datasets: [
-                        {
-                            label: '国語', // データセットのラベル
-                            data: japaneseScores, // 国語の成績データを設定
-                            backgroundColor: 'rgba(255, 99, 132, 0.7)', // 棒グラフの色
-                        },
-                        {
-                            label: '数学', // データセットのラベル
-                            data: mathScores, // 数学の成績データを設定
-                            backgroundColor: 'rgba(54, 162, 235, 0.7)', // 棒グラフの色
-                        },
-                        {
-                            label: '英語', // データセットのラベル
-                            data: englishScores, // 英語の成績データを設定
-                            backgroundColor: 'rgba(255, 206, 86, 0.7)', // 棒グラフの色
-                        },
-                        {
-                            label: '理科', // データセットのラベル
-                            data: scienceScores, // 理科の成績データを設定
-                            backgroundColor: 'rgba(75, 192, 192, 0.7)', // 棒グラフの色
-                        },
-                        {
-                            label: '社会', // データセットのラベル
-                            data: societyScores, // 社会の成績データを設定
-                            backgroundColor: 'rgba(153, 102, 255, 0.7)', // 棒グラフの色
-                        },
-                    ]
-                },
-                options: {
-                    // オプションの設定
-                    scales: {
-                        x: {
-                            stacked: true, // X軸を積み上げ
-                        },
-                        y: {
-                            stacked: true,
-                            beginAtZero: true,
-                            suggestedMax: 500, // Y軸の最大値を500に設定
-                        },
-                    }
-                }
-            });
-
-            // 折れ線グラフの処理を記述する
-            const lineCtx = document.getElementById('lineChart').getContext('2d');
-            const lineChart = new Chart(lineCtx, {
-                type: 'line',
-                data: {
-                    labels: testNames, // テスト名をX軸のラベルに設定
-                    datasets: [
-                        {
-                            label: '国語', // データセットのラベル
-                            data: japaneseScores, // 国語の成績データを設定
-                            borderColor: 'rgba(255, 99, 132, 1)', // 折れ線グラフの色
-                            fill: false, // 線を塗りつぶさない
-                        },
-                        {
-                            label: '数学', // データセットのラベル
-                            data: mathScores, // 数学の成績データを設定
-                            borderColor: 'rgba(54, 162, 235, 1)', // 折れ線グラフの色
-                            fill: false, // 線を塗りつぶさない
-                        },
-                        {
-                            label: '英語', // データセットのラベル
-                            data: englishScores, // 英語の成績データを設定
-                            borderColor: 'rgba(255, 206, 86, 1)', // 折れ線グラフの色
-                            fill: false, // 線を塗りつぶさない
-                        },
-                        {
-                            label: '理科', // データセットのラベル
-                            data: scienceScores, // 理科の成績データを設定
-                            borderColor: 'rgba(75, 192, 192, 1)', // 折れ線グラフの色
-                            fill: false, // 線を塗りつぶさない
-                        },
-                        {
-                            label: '社会', // データセットのラベル
-                            data: societyScores, // 社会の成績データを設定
-                            borderColor: 'rgba(153, 102, 255, 1)', // 折れ線グラフの色
-                            fill: false, // 線を塗りつぶさない
-                        },
-                    ]
-                },
-                options: {
-                    // オプションの設定
-                    scales: {
-                        x: {
-                            beginAtZero: true, // X軸を0から始める
-                        },
-                        y: {
-                            beginAtZero: true,
-                            suggestedMax: 100, // Y軸の最大値を100に設定
-                        }
-                    }
-                }
-            });
-        };
-
-        function goBack() {
-            window.history.back();
+<script defer>
+    // DOMが完全に読み込まれた後に処理を実行する
+    window.onload = function () {
+        // Canvas要素が存在するか確認
+        const canvas = document.getElementById('myChart');
+        if (!canvas) {
+            console.error('Canvas要素が見つかりません。');
+            return;
         }
 
+        // チャートの処理を記述する
+        const ctx = canvas.getContext('2d');
+        const testNames = <?php echo json_encode($testNames); ?>; // テスト名を配列に設定
+        const japaneseScores = <?php echo json_encode($japaneseScores); ?>;
+        const mathScores = <?php echo json_encode($mathScores); ?>;
+        const englishScores = <?php echo json_encode($englishScores); ?>;
+        const scienceScores = <?php echo json_encode($scienceScores); ?>;
+        const societyScores = <?php echo json_encode($societyScores); ?>;
 
-    </script>
-</head>
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: testNames, // テスト名をX軸のラベルに設定
+                datasets: [
+                    {
+                        label: '国語', // データセットのラベル
+                        data: japaneseScores, // 国語の成績データを設定
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)', // 棒グラフの色
+                    },
+                    {
+                        label: '数学', // データセットのラベル
+                        data: mathScores, // 数学の成績データを設定
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)', // 棒グラフの色
+                    },
+                    {
+                        label: '英語', // データセットのラベル
+                        data: englishScores, // 英語の成績データを設定
+                        backgroundColor: 'rgba(255, 206, 86, 0.7)', // 棒グラフの色
+                    },
+                    {
+                        label: '理科', // データセットのラベル
+                        data: scienceScores, // 理科の成績データを設定
+                        backgroundColor: 'rgba(75, 192, 192, 0.7)', // 棒グラフの色
+                    },
+                    {
+                        label: '社会', // データセットのラベル
+                        data: societyScores, // 社会の成績データを設定
+                        backgroundColor: 'rgba(153, 102, 255, 0.7)', // 棒グラフの色
+                    },
+                ]
+            },
+            options: {
+                // オプションの設定
+                scales: {
+                    x: {
+                        stacked: true, // X軸を積み上げ
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        suggestedMax: 500, // Y軸の最大値を500に設定
+                    },
+                }
+            }
+        });
+
+        // 折れ線グラフの処理を記述する
+        const lineCtx = document.getElementById('lineChart').getContext('2d');
+        const lineChart = new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: testNames, // テスト名をX軸のラベルに設定
+                datasets: [
+                    {
+                        label: '国語', // データセットのラベル
+                        data: japaneseScores, // 国語の成績データを設定
+                        borderColor: 'rgba(255, 99, 132, 1)', // 折れ線グラフの色
+                        fill: false, // 線を塗りつぶさない
+                    },
+                    {
+                        label: '数学', // データセットのラベル
+                        data: mathScores, // 数学の成績データを設定
+                        borderColor: 'rgba(54, 162, 235, 1)', // 折れ線グラフの色
+                        fill: false, // 線を塗りつぶさない
+                    },
+                    {
+                        label: '英語', // データセットのラベル
+                        data: englishScores, // 英語の成績データを設定
+                        borderColor: 'rgba(255, 206, 86, 1)', // 折れ線グラフの色
+                        fill: false, // 線を塗りつぶさない
+                    },
+                    {
+                        label: '理科', // データセットのラベル
+                        data: scienceScores, // 理科の成績データを設定
+                        borderColor: 'rgba(75, 192, 192, 1)', // 折れ線グラフの色
+                        fill: false, // 線を塗りつぶさない
+                    },
+                    {
+                        label: '社会', // データセットのラベル
+                        data: societyScores, // 社会の成績データを設定
+                        borderColor: 'rgba(153, 102, 255, 1)', // 折れ線グラフの色
+                        fill: false, // 線を塗りつぶさない
+                    },
+                ]
+            },
+            options: {
+                // オプションの設定
+                scales: {
+                    x: {
+                        beginAtZero: true, // X軸を0から始める
+                    },
+                    y: {
+                        beginAtZero: true,
+                        suggestedMax: 100, // Y軸の最大値を100に設定
+                    }
+                }
+            }
+        });
+    };
+
+    function goBack() {
+        window.history.back();
+    }
+
+</script>
 
 <body>
     <style>
@@ -213,64 +202,75 @@ try {
         #lineChart {
             max-width: 600px;
             max-height: 400px;
-            width: 100%;
-            height: auto;
+        }
+
+        /* 追加スタイル */
+        .chart-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
         }
     </style>
-    <canvas id="myChart"></canvas>
-    <canvas id="lineChart"></canvas>
-    <table>
-        <tr>
-            <th>テスト名</th>
-            <th>学籍番号　</th>
-            <th>受験者名</th>
-            <th>国語　</th>
-            <th>数学　</th>
-            <th>英語　</th>
-            <th>理科　</th>
-            <th>社会　</th>
-            <th>合計　</th>
-        </tr>
-
-        <?php
-        foreach ($results as $row) {
-            ?>
-            <tr>
-                <td>
-                    <?php echo $row['test_name']; ?>
-                </td>
-                <td>
-                    <?php echo $number; ?>
-                </td>
-                <td>
-                    <?php echo $name; ?>
-                </td>
-                <td>
-                    <?php echo $row['japanese']; ?>
-                </td>
-                <td>
-                    <?php echo $row['math']; ?>
-                </td>
-                <td>
-                    <?php echo $row['english']; ?>
-                </td>
-                <td>
-                    <?php echo $row['science']; ?>
-                </td>
-                <td>
-                    <?php echo $row['society']; ?>
-                </td>
-                <td>
-                    <?php echo $row['total']; ?>
-                </td>
-            </tr>
-            <?php
-        }
-        ?>
-    </table>
-
-    <a href="s_index.php">戻る</a>
-
-</body>
-
-</html>
+    <div class="bg-white justify-content-evenly flex-wrap rounded">
+        <div class="container">
+            <br/>
+            <!-- チャートを横並びに表示 -->
+            <div class="chart-container">
+                <canvas id="myChart"></canvas>
+                <canvas id="lineChart"></canvas>
+            </div>
+            <table>
+                <tr class="border">
+                    <th class="border">テスト名</th>
+                    <th class="border">学籍番号　</th>
+                    <th class="border">受験者名</th>
+                    <th class="border">国語　</th>
+                    <th class="border">数学　</th>
+                    <th class="border">英語　</th>
+                    <th class="border">理科　</th>
+                    <th class="border">社会　</th>
+                    <th class="border">合計　</th>
+                </tr>
+                <br />
+                <?php
+                foreach ($results as $row) {
+                    ?>
+                    <tr class="h4 border">
+                        <td class="border">
+                            <?php echo $row['test_name']; ?>
+                        </td>
+                        <td class="border">
+                            <?php echo $number; ?>
+                        </td>
+                        <td class="border">
+                            <?php echo $name; ?>
+                        </td>
+                        <td class="border">
+                            <?php echo $row['japanese']; ?>
+                        </td>
+                        <td class="border">
+                            <?php echo $row['math']; ?>
+                        </td>
+                        <td class="border">
+                            <?php echo $row['english']; ?>
+                        </td>
+                        <td class="border">
+                            <?php echo $row['science']; ?>
+                        </td>
+                        <td class="border">
+                            <?php echo $row['society']; ?>
+                        </td>
+                        <td class="border">
+                            <?php echo $row['total']; ?>
+                        </td>
+                    </tr>
+                    <?php
+                }
+                ?>
+            </table>
+            <br/>
+        </div>
+    </div>
+    <br />
+    <a href="s_index.php" class="btn btn-primary">戻る</a>
+    <br /><br />

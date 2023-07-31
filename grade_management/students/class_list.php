@@ -135,14 +135,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 
-<!DOCTYPE html>
-<html lang="ja">
-
-<head>
-    <meta charset="UTF-8" />
-    <title>成績管理アプリ</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
     <script>
         function sendAjaxRequest(formId, action) {
             const form = document.getElementById(formId);
@@ -194,7 +186,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <body>
 
-
+<div class="bg-white justify-content-evenly flex-wrap rounded">
     <?php
     // 取得したデータを表示
     if (!empty($results)) {
@@ -202,7 +194,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             ?>
 
-            <br />
+            <br />　
             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#s_edit_<?php echo $row['id']; ?>"><?php echo $row['year'] . ' 年' . $row['class'] . '組　学籍番号' . $row['number'] . '　名前　' . $row['name'] . ''; ?></button>
             <br />
             <div class="modal fade" id="s_edit_<?php echo $row['id']; ?>">
@@ -267,9 +259,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo '該当する生徒情報はありません。';
     }
     ?>
-
-    <a href="s_index.php">クラス一覧へ戻る</a>
-    </form>
-</body>
-
-</html>
+    <br/>
+</div>
+<br/>
+    <a href="s_index.php" class="btn btn-primary">クラス一覧へ戻る</a>
+<br/><br/>

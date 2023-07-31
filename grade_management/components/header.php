@@ -46,11 +46,20 @@ $post = sanitizePostArray($_POST);
     </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<h5>ログインユーザー名:
-    <?php echo $login_user; ?>
 
-    　　ログイン日時:
-    <?php echo $login_time; ?>
-
-<a href="#" onclick="confirmLogout()">ログアウト</a><br /><br /></h5>
+<body>
+    <div class="container-fluid bg-primary  min-vh-100 d-flex align-items-center">
+        <div class="container bg-info rounded">
+            <div class="text-center h1 text-light"><br/>成績管理アプリ</div>
+            <div class="row justify-content-end">
+                <div class="col-auto">
+                    <br />
+                    ログインユーザー名:
+                    <?php echo $login_user; ?>
+                    ログイン日時:
+                    <?php echo $login_time; ?>
+                    <a href="#" button class="btn btn-primary" onclick="confirmLogout()"><h5>ログアウト</h5></a><br /><br/>
+                </div>
+            </div>

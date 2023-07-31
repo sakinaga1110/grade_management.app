@@ -35,7 +35,7 @@ include 'components/header.php';
         $stmt = $dbh->prepare($sql);
 
         // パラメータのバインド
-        if ($role === 'chief'||$role ==='general') {
+        if ($role === 'chief' || $role === 'general') {
             $stmt->bindParam(':year', $teacher_year, PDO::PARAM_INT);
         }
 
@@ -52,31 +52,35 @@ include 'components/header.php';
         echo 'エラーが発生しました：' . $e->getMessage();
     }
     ?>
+    <div class="d-flex justify-content-evenly bg-white rounded">
+        <?php
+        // 取得したデータを繰り返し処理で表示
+        $currentYear = null;
+        foreach ($results as $row) {
+            if ($currentYear !== $row['year']) {
+                if ($currentYear !== null) {
+                    echo '</ul>';
+                }
+                echo '<ul class="">';
+                echo '<h3>' . $row['year'] . '年</h3>';
 
-    <?php
-    // 取得したデータを繰り返し処理で表示
-    $currentYear = null;
-    foreach ($results as $row) {
-        if ($currentYear !== $row['year']) {
-            if ($currentYear !== null) {
-                echo '</ul>';
+                $currentYear = $row['year'];
             }
-            echo '<h3>' . $row['year'] . '年</h3>';
-            echo '<ul>';
-            $currentYear = $row['year'];
+            echo '<div class="h3"><li><a href="exams/e_result.php?test_id=' . $row['id'] . '">' . $row['test_name'] . '</a></li></div><br/>';
         }
-        echo '<li><a href="exams/e_result.php?test_id=' . $row['id'] . '">' . $row['test_name'] . '</a></li>';
-    }
-    if ($currentYear !== null) {
-        echo '</ul>';
-    }
-    ?>
+        if ($currentYear !== null) {
+            echo '</ul>';
+        }
+        ?>
+    </div>
     <br />
-    <a href="tests/t_index.php">テスト一覧</a><br />
+    <div class="d-flex justify-content-evenly">
+        <br />
+        <a href="tests/t_index.php" button class="btn btn-primary"><h3>テスト一覧</h3></a><br />
 
-    <a href="students/s_index.php">生徒一覧</a><br />
+        <a href="students/s_index.php" button class="btn btn-primary"><h3>生徒一覧</h3></a><br />
 
-    <a href="exams/e_index.php">成績一覧</a><br />
-</body>
-
-</html>
+        <a href="exams/e_index.php" button class="btn btn-primary"><h3>成績一覧</h3></a><br />
+    </div>
+    <br />
+    <br/>

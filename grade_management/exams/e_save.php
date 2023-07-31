@@ -25,19 +25,18 @@ try {
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // SQL文の準備
-    $sql = 'INSERT INTO exams (test_id, student_id, year, japanese,math,english,science,society,total, created_at, updated_at) VALUES (?, ?,?,?,?,?,?,?,?, NOW(), NOW())';
+    $sql = 'INSERT INTO exams (test_id, student_id, japanese,math,english,science,society,total, created_at, updated_at) VALUES (?, ?,?,?,?,?,?,?, NOW(), NOW())';
     $stmt = $dbh->prepare($sql);
 
     // 値のバインド
     $stmt->bindValue(1, $test_id, PDO::PARAM_INT);
     $stmt->bindValue(2, $class_id, PDO::PARAM_STR);
-    $stmt->bindValue(3, $year, PDO::PARAM_STR);
-    $stmt->bindValue(4, $japanese, PDO::PARAM_INT);
-    $stmt->bindValue(5, $math, PDO::PARAM_INT);
-    $stmt->bindValue(6, $english, PDO::PARAM_INT);
-    $stmt->bindValue(7, $science, PDO::PARAM_INT);
-    $stmt->bindValue(8, $society, PDO::PARAM_INT);
-    $stmt->bindValue(9, $total, PDO::PARAM_INT);
+    $stmt->bindValue(3, $japanese, PDO::PARAM_INT);
+    $stmt->bindValue(4, $math, PDO::PARAM_INT);
+    $stmt->bindValue(5, $english, PDO::PARAM_INT);
+    $stmt->bindValue(6, $science, PDO::PARAM_INT);
+    $stmt->bindValue(7, $society, PDO::PARAM_INT);
+    $stmt->bindValue(8, $total, PDO::PARAM_INT);
 
 
     // SQL文の実行

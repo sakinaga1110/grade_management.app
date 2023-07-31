@@ -2,8 +2,9 @@
 // 共通ヘッダーを読み込む
 include '../components/header.php';
 
-?><?php
-$subject=$_POST['subject'];
+?>
+<?php
+$subject = $_POST['subject'];
 if (isset($_POST['test_id'])) {
     $test_id = $_POST['test_id'];
     //var_dump($test_id);
@@ -86,7 +87,7 @@ if (isset($_POST['test_id'])) {
         } else {
             // 通常の表示の場合のスタイルを設定
             $icon_classes = [];
-           
+
         }
         // データベース接続の解放
         $dbh = null;
@@ -98,125 +99,123 @@ if (isset($_POST['test_id'])) {
 }
 
 ?>
-<!DOCTYPE html>
-<html lang="ja">
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-<head>
-    <meta charset="UTF-8" />
-    <title>テスト成績一覧</title>
-    <link rel="stylesheet" href="">
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+    th,
+    td {
+        padding: 8px;
+        border: 1px solid #ccc;
+        text-align: center;
+    }
 
-        th,
-        td {
-            padding: 8px;
-            border: 1px solid #ccc;
-            text-align: center;
-        }
+    th {
+        background-color: #f2f2f2;
+    }
 
-        th {
-            background-color: #f2f2f2;
-        }
+    /* Center the icons */
+    td i {
+        display: block;
+        margin: 0 auto;
+    }
 
-        /* Center the icons */
-        td i {
-            display: block;
-            margin: 0 auto;
-        }
+    .color-red {
+        color: red;
+    }
 
-        .color-red {
-            color: red;
-        }
+    .color-blue {
+        color: blue;
+    }
 
-        .color-blue {
-            color: blue;
-        }
+    .color-green {
+        color: green;
+    }
 
-        .color-green {
-            color: green;
-        }
+    .color-orange {
+        color: orange;
+    }
 
-        .color-orange {
-            color: orange;
-        }
-
-        .color-purple {
-            color: purple;
-        }
-    </style>
-    <script src="https://kit.fontawesome.com/d303258a45.js" crossorigin="anonymous"></script>
+    .color-purple {
+        color: purple;
+    }
+</style>
+<script src="https://kit.fontawesome.com/d303258a45.js" crossorigin="anonymous"></script>
 
 <body>
-    <?php if (isset($results) && count($results) > 0) { ?>
-        <h2>テスト成績一覧</h2><br />
-        <h3>
-            <?php echo $subject; ?>
-        </h3>
-        <form method="post" action="e_download.php">
-            <input type="hidden" name="subject" value="<?php echo$subject; ?>">
-            <input type="hidden" name="test_id" value="<?php echo $test_id; ?>">
-           
-            <input type="hidden" name="order_by" value="<?php echo$order_by; ?>">
-            <table>
-                <tr>
-                    <th>順番</th>
-                    <th>学籍番号
-                    </th>
-                    <th>名前
-                    </th>
-                    <th>国語
-                    </th>
-                    <th>数学
-                    </th>
-                    <th>英語
-                    </th>
-                    <th>理科
-                    </th>
-                    <th>社会
-                    </th>
-                    <th>合計
-                    </th>
-                </tr>
-                <?php foreach ($results as $index => $row) {
-                    // Determine the class based on index
-                    $icon_class = isset($icon_classes[$index + 1]) ? $icon_classes[$index + 1] : '';
-                    echo '<tr>';
-                    echo '<td><i class="fa-solid fa-' . ($index + 1) . ' ' . $icon_class . '"></i></td>';
-                    echo '<td>' . $row['number'] . '</td>';
-                    echo '<td>';
 
-                    // 上位3人の名前を大きく太字にして下線を追加する
-                    if (!empty($_POST['subject']) && $index < 3) {
-                        echo '<strong style="font-size: 30px; text-decoration: underline;">' . strtoupper($row['name']) . '</strong>';
-                    } else {
-                        echo $row['name'];
-                    }
+    <div class="bg-white rounded">
+        <div class="container">
+            <?php if (isset($results) && count($results) > 0) { ?>
+                <h2>テスト成績一覧</h2><br />
+                <h3>
+                    <?php echo $subject; ?>
+                </h3>
+                <form method="post" action="e_download.php">
+                    <input type="hidden" name="subject" value="<?php echo $subject; ?>">
+                    <input type="hidden" name="test_id" value="<?php echo $test_id; ?>">
 
-                    echo '</td>';
-                    echo '<td>' . $row['japanese'] . '</td>';
-                    echo '<td>' . $row['math'] . '</td>';
-                    echo '<td>' . $row['english'] . '</td>';
-                    echo '<td>' . $row['science'] . '</td>';
-                    echo '<td>' . $row['society'] . '</td>';
-                    echo '<td>' . $row['total'] . '</td>';
-                    echo '</tr>';
-                } ?>
+                    <input type="hidden" name="order_by" value="<?php echo $order_by; ?>">
+                    <table>
+                        <tr>
+                            <th>順番</th>
+                            <th>学籍番号
+                            </th>
+                            <th>名前
+                            </th>
+                            <th>国語
+                            </th>
+                            <th>数学
+                            </th>
+                            <th>英語
+                            </th>
+                            <th>理科
+                            </th>
+                            <th>社会
+                            </th>
+                            <th>合計
+                            </th>
+                        </tr>
+                        <?php foreach ($results as $index => $row) {
+                            // Determine the class based on index
+                            $icon_class = isset($icon_classes[$index + 1]) ? $icon_classes[$index + 1] : '';
+                            echo '<tr>';
+                            echo '<td><i class="fa-solid fa-' . ($index + 1) . ' ' . $icon_class . '"></i></td>';
+                            echo '<td>' . $row['number'] . '</td>';
+                            echo '<td>';
 
-            </table>
-   
-            <input type="submit" value="csvダウンロード">
-        </form>
+                            // 上位3人の名前を大きく太字にして下線を追加する
+                            if (!empty($_POST['subject']) && $index < 3) {
+                                echo '<strong style="font-size: 30px; text-decoration: underline;">' . strtoupper($row['name']) . '</strong>';
+                            } else {
+                                echo $row['name'];
+                            }
+
+                            echo '</td>';
+                            echo '<td>' . $row['japanese'] . '</td>';
+                            echo '<td>' . $row['math'] . '</td>';
+                            echo '<td>' . $row['english'] . '</td>';
+                            echo '<td>' . $row['science'] . '</td>';
+                            echo '<td>' . $row['society'] . '</td>';
+                            echo '<td>' . $row['total'] . '</td>';
+                            echo '</tr>';
+                        } ?>
+
+                    </table>
+                    <br /> <br />
+                    <input type="submit" value="csvダウンロード" class="btn btn-primary">
+                    <br /> <br />
+                </form>
+            </div>
+        </div>
+
         <br />
     <?php } else {
-        echo '該当する成績はありません。';
-    } ?>
+                echo '該当する成績はありません。';
+            } ?>
     <br />
     <br />
-    <a href="../index.php">戻る</a>
-</body>
-
-</html>
+    <a href="../index.php" class="btn btn-primary">戻る</a>
+    <br /> <br />

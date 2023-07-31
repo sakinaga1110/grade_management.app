@@ -1,6 +1,5 @@
 <?php 
 require_once('../components/header.php');
-$post=sanitize($_POST);
 
 $year = $post['year'];
 $test_name = $post['test_name'];
